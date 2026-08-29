@@ -4,6 +4,7 @@ import { useState } from "react";
 
 export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
   return (
     <main>
@@ -78,7 +79,7 @@ export default function Home() {
 
 
               <a
-                href="/Ntung_Ngela_Landon_CV.pdf"
+                href={`${basePath}/Ntung_Ngela_Landon_CV.pdf`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="button secondary"
@@ -90,7 +91,7 @@ export default function Home() {
 
 <div className="hero-card">
   <img
-    src="/Landon.jpg"
+    src={`${basePath}/Landon.jpg`}
     alt="Ntung Ngela Landon"
     className="profile-photo"
   />
@@ -661,7 +662,7 @@ export default function Home() {
           <div className="project-feature">
             <div className="project-description">
               <p>
-                My Master's final practicum project developed for a client
+                My Master&apos;s final practicum project developed for a client
                 environment at Carnegie Mellon University.
               </p>
 

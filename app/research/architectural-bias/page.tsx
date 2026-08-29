@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function ArchitecturalBiasPage() {
   return (
     <main>
@@ -6,15 +8,15 @@ export default function ArchitecturalBiasPage() {
 
         <div className="nav-container">
 
-          <a href="/" className="logo">
+          <Link href="/" className="logo">
             NL<span>.</span>
-          </a>
+          </Link>
 
           <div className="nav-links">
-            <a href="/research">Research</a>
-            <a href="/publications">Publications</a>
-            <a href="/projects">Projects</a>
-            <a href="/about">About</a>
+            <Link href="/research">Research</Link>
+            <Link href="/publications">Publications</Link>
+            <Link href="/projects">Projects</Link>
+            <Link href="/about">About</Link>
           </div>
 
         </div>
