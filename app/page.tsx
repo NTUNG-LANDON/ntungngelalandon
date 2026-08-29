@@ -64,21 +64,15 @@ const fontOptions: { id: FontName; label: string; detail: string }[] = [
 
 const researchQuestions = [
   {
-    number: "01",
     title: "Fairness under distribution shift",
-    text: "When datasets, training seeds, and evaluation protocols change, which fairness conclusions remain reliable?",
     tags: ["Robustness", "Reproducibility"],
   },
   {
-    number: "02",
     title: "Architecture and demographic bias",
-    text: "How do convolutional and transformer-based vision systems differ across demographic groups and unseen populations?",
     tags: ["Computer vision", "Biometrics"],
   },
   {
-    number: "03",
     title: "Security of AI-enabled systems",
-    text: "How can we evaluate model vulnerabilities and build security evidence that survives real-world constraints?",
     tags: ["AI/ML security", "Evaluation"],
   },
 ];
@@ -185,6 +179,18 @@ function TuneIcon() {
   return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10M14 4v6M6 14v6" /></svg>;
 }
 
+function GithubIcon() {
+  return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 19c-4.5 1.4-4.5-2.4-6-3m12 6v-3.9c0-1.1.1-1.6-.5-2.2 2.8-.3 5.7-1.4 5.7-6.2A4.8 4.8 0 0 0 19 6.4 4.5 4.5 0 0 0 18.9 3S17.8 2.7 15 4.2a11.5 11.5 0 0 0-6 0C6.2 2.7 5.1 3 5.1 3A4.5 4.5 0 0 0 5 6.4a4.8 4.8 0 0 0-1.2 3.3c0 4.8 2.9 5.9 5.7 6.2-.5.5-.6 1-.5 2.1V22" /></svg>;
+}
+
+function LinkedinIcon() {
+  return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4V9h4v2M2 9h4v12H2z" /><path d="M4 6a2 2 0 1 0 0-4 2 2 0 0 0 0 4" /></svg>;
+}
+
+function PaperIcon() {
+  return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2h9l4 4v16H6zM14 2v5h5M9 12h7M9 16h7" /></svg>;
+}
+
 export default function Home() {
   const [config, setConfig] = useState<SiteConfig>(defaultConfig);
   const [studioOpen, setStudioOpen] = useState(false);
@@ -279,49 +285,39 @@ export default function Home() {
           <div className="site-shell hero-grid">
             <div className="hero-copy">
               <p className="kicker"><span /> AI / ML security · Trustworthy AI</p>
-              <h1>Securing machine learning for the conditions that matter.</h1>
+              <h1>AI / ML Security Researcher</h1>
               <p className="hero-lede">I study how AI systems behave when fairness, robustness, and security are tested beyond controlled settings.</p>
               <p className="hero-note">Research Associate at Carnegie Mellon University, working across biometric security, distribution shift, reproducibility, and malware analysis.</p>
               <div className="hero-actions">
-                {config.sections.research && <a className="text-link text-link-primary" href="#research">Explore my research <ArrowIcon /></a>}
-                {config.sections.contact && <a className="text-link" href="mailto:nngelala@andrew.cmu.edu">Get in touch <ArrowIcon /></a>}
+                <a className="text-link text-link-primary" href={`${basePath}/Ntung_Ngela_Landon_CV.pdf`} download>Download CV <ArrowIcon /></a>
               </div>
             </div>
             {config.portrait !== "hidden" && (
               <div className="portrait-wrap">
                 <span className="portrait-outline" aria-hidden="true" />
                 <Image src={`${basePath}/Landon.jpg`} alt="Ntung Ngela Landon" className="portrait" width={392} height={596} priority />
-                <p className="portrait-caption"><span>Currently</span> Pittsburgh, USA</p>
               </div>
             )}
           </div>
           <div className="site-shell scholar-strip" aria-label="Scholarly links">
             <span>Research profiles</span>
-            <a href="https://github.com/NTUNG-LANDON" target="_blank" rel="noreferrer">GitHub <ExternalIcon /></a>
-            <a href="https://www.linkedin.com/in/ntung-landon" target="_blank" rel="noreferrer">LinkedIn <ExternalIcon /></a>
-            <a href="https://doi.org/10.3390/jcp6010012" target="_blank" rel="noreferrer">Latest paper <ExternalIcon /></a>
+            <a href="https://github.com/NTUNG-LANDON" target="_blank" rel="noreferrer"><GithubIcon /> GitHub</a>
+            <a href="https://www.linkedin.com/in/ntung-landon" target="_blank" rel="noreferrer"><LinkedinIcon /> LinkedIn</a>
+            <a href="https://doi.org/10.3390/jcp6010012" target="_blank" rel="noreferrer"><PaperIcon /> Latest paper</a>
           </div>
         </section>
 
         {config.sections.research && (
           <section className="content-section research-section" id="research">
             <div className="site-shell">
-              <div className="section-heading">
-                <div><p className="section-index">01 · Research</p><h2>Questions shaping my work</h2></div>
-                <p>My research connects rigorous empirical evaluation with practical cybersecurity—especially where aggregate performance can hide unequal or unstable behavior.</p>
-              </div>
+              <div className="section-heading section-heading-simple"><h2>Research</h2></div>
               <div className="question-grid">
                 {researchQuestions.map((item) => (
-                  <article className="question-card" key={item.number}>
-                    <span className="card-number">{item.number}</span><h3>{item.title}</h3><p>{item.text}</p>
+                  <article className="question-card" key={item.title}>
+                    <h3>{item.title}</h3>
                     <div className="tag-row">{item.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
                   </article>
                 ))}
-              </div>
-              <div className="research-statement">
-                <p className="statement-label">Research direction</p>
-                <p className="statement-copy">I am interested in the security, reliability, and trustworthy deployment of machine-learning systems: how vulnerabilities emerge, how evaluation choices shape our conclusions, and how evidence can remain useful across populations and environments.</p>
-                <a className="text-link" href={`${basePath}/research/`}>Read the full research profile <ArrowIcon /></a>
               </div>
             </div>
           </section>
@@ -331,7 +327,7 @@ export default function Home() {
           <section className="content-section publications-section" id="publications">
             <div className="site-shell">
               <div className="section-heading section-heading-compact">
-                <div><p className="section-index">02 · Publications</p><h2>Selected writing</h2></div>
+                <div><h2>Publications</h2></div>
                 <a className="text-link" href={`${basePath}/publications/`}>View all <ArrowIcon /></a>
               </div>
               <div className="publication-list">
@@ -352,11 +348,11 @@ export default function Home() {
         {config.sections.experience && (
           <section className="content-section experience-section" id="experience">
             <div className="site-shell split-section">
-              <div className="split-intro"><p className="section-index">03 · Experience</p><h2>Research across models, systems, and settings.</h2><p>From biometric model evaluation to platform security and malware analysis, my work bridges research questions with deployable systems.</p></div>
+              <div className="split-intro"><h2>Experience</h2></div>
               <div className="timeline">
-                {experience.map((item, index) => (
+                {experience.map((item) => (
                   <article className="timeline-item" key={`${item.role}-${item.date}`}>
-                    <span className="timeline-dot">{String(index + 1).padStart(2, "0")}</span>
+                    <span className="timeline-dot" aria-hidden="true" />
                     <div><p className="timeline-date">{item.date}</p><h3>{item.role}</h3><p className="timeline-place">{item.place}</p><p>{item.text}</p></div>
                   </article>
                 ))}
@@ -369,7 +365,7 @@ export default function Home() {
           <section className="content-section projects-section" id="projects">
             <div className="site-shell">
               <div className="section-heading section-heading-compact">
-                <div><p className="section-index">04 · Projects</p><h2>Systems I have built</h2></div>
+                <div><h2>Projects</h2></div>
                 <a className="text-link" href={`${basePath}/projects/`}>Project details <ArrowIcon /></a>
               </div>
               <div className="project-grid">
@@ -389,7 +385,7 @@ export default function Home() {
             <div className="site-shell profile-grid">
               {config.sections.about && (
                 <div className="about-block">
-                  <p className="section-index">05 · Profile</p><h2>Research grounded in careful evaluation.</h2>
+                  <h2>About</h2>
                   <p>My path began with demographic fairness in face Presentation Attack Detection and expanded into the broader security, robustness, and reliability of AI-enabled systems.</p>
                   <p>I value reproducible experiments, transparent limitations, and research that can inform more secure real-world systems.</p>
                   <a className="text-link" href={`${basePath}/about/`}>More about me <ArrowIcon /></a>
@@ -416,7 +412,7 @@ export default function Home() {
 
         {config.sections.contact && (
           <section className="contact-section" id="contact">
-            <div className="site-shell contact-grid"><p className="section-index">Let&apos;s connect</p><h2>Open to thoughtful conversations about AI security and trustworthy evaluation.</h2><a className="contact-email" href="mailto:nngelala@andrew.cmu.edu">nngelala@andrew.cmu.edu <ArrowIcon /></a></div>
+            <div className="site-shell contact-grid"><h2>Contact</h2><a className="contact-email" href="mailto:nngelala@andrew.cmu.edu">nngelala@andrew.cmu.edu <ArrowIcon /></a></div>
           </section>
         )}
       </main>
