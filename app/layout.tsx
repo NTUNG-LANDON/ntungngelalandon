@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Ntung Ngela Landon | Cybersecurity Researcher",
+  metadataBase: new URL("https://ntungngelalandon.com"),
+  title: "Ntung Ngela Landon | AI / ML Security Researcher",
   description:
-    "Academic portfolio of Ntung Ngela Landon, a cybersecurity researcher working at the intersection of AI security, biometric security, trustworthy AI, and cybersecurity.",
+    "Research portfolio of Ntung Ngela Landon, working across AI/ML security, biometric security, fairness, robustness, and trustworthy AI.",
   keywords: [
     "Ntung Ngela Landon",
     "Cybersecurity Researcher",
@@ -20,9 +21,11 @@ export const metadata: Metadata = {
     },
   ],
   openGraph: {
-    title: "Ntung Ngela Landon | Cybersecurity Researcher",
+    title: "Ntung Ngela Landon | AI / ML Security Researcher",
     description:
-      "Cybersecurity researcher working at the intersection of AI security, biometric security, and trustworthy AI.",
+      "Research across AI/ML security, biometric security, fairness, robustness, and trustworthy AI.",
+    url: "https://ntungngelalandon.com",
+    images: [{ url: "/Landon.jpg", alt: "Ntung Ngela Landon" }],
     type: "website",
   },
 };

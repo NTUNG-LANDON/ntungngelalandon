@@ -1,996 +1,488 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import Image from "next/image";
+
+type ThemeName = "graphite" | "burgundy" | "forest" | "cobalt" | "violet" | "mono";
+type FontName = "cv" | "editorial" | "modern" | "humanist";
+type HeroLayout = "split" | "center" | "compact";
+type PortraitPlacement = "right" | "left" | "hidden";
+type ContentWidth = "compact" | "balanced" | "wide";
+type Density = "compact" | "comfortable" | "airy";
+type PublicationLayout = "list" | "grid";
+type CornerStyle = "sharp" | "soft" | "round";
+type SectionKey = "research" | "publications" | "experience" | "projects" | "education" | "skills" | "about" | "contact";
+
+type SiteConfig = {
+  theme: ThemeName;
+  font: FontName;
+  hero: HeroLayout;
+  portrait: PortraitPlacement;
+  width: ContentWidth;
+  density: Density;
+  publications: PublicationLayout;
+  corners: CornerStyle;
+  sections: Record<SectionKey, boolean>;
+};
+
+const defaultConfig: SiteConfig = {
+  theme: "graphite",
+  font: "cv",
+  hero: "split",
+  portrait: "right",
+  width: "balanced",
+  density: "comfortable",
+  publications: "list",
+  corners: "soft",
+  sections: {
+    research: true,
+    publications: true,
+    experience: true,
+    projects: true,
+    education: true,
+    skills: true,
+    about: true,
+    contact: true,
+  },
+};
+
+const themes: { id: ThemeName; label: string; color: string }[] = [
+  { id: "graphite", label: "Graphite Blue", color: "#2563eb" },
+  { id: "burgundy", label: "Burgundy Ink", color: "#7a1f2b" },
+  { id: "forest", label: "Forest Lab", color: "#2d6a4f" },
+  { id: "cobalt", label: "Cobalt Research", color: "#4869e8" },
+  { id: "violet", label: "Violet Signal", color: "#7950f2" },
+  { id: "mono", label: "Monochrome", color: "#111111" },
+];
+
+const fontOptions: { id: FontName; label: string; detail: string }[] = [
+  { id: "cv", label: "CV Original", detail: "Fraunces · DM Sans" },
+  { id: "editorial", label: "Editorial", detail: "Newsreader · Manrope" },
+  { id: "modern", label: "Modern Sans", detail: "Space Grotesk · DM Sans" },
+  { id: "humanist", label: "Humanist", detail: "Sora · Manrope" },
+];
+
+const researchQuestions = [
+  {
+    number: "01",
+    title: "Fairness under distribution shift",
+    text: "When datasets, training seeds, and evaluation protocols change, which fairness conclusions remain reliable?",
+    tags: ["Robustness", "Reproducibility"],
+  },
+  {
+    number: "02",
+    title: "Architecture and demographic bias",
+    text: "How do convolutional and transformer-based vision systems differ across demographic groups and unseen populations?",
+    tags: ["Computer vision", "Biometrics"],
+  },
+  {
+    number: "03",
+    title: "Security of AI-enabled systems",
+    text: "How can we evaluate model vulnerabilities and build security evidence that survives real-world constraints?",
+    tags: ["AI/ML security", "Evaluation"],
+  },
+];
+
+const publications = [
+  {
+    year: "2026",
+    status: "Peer-reviewed journal",
+    title: "Fairness-Aware Face Presentation Attack Detection Using Local Binary Patterns: Bridging Skin Tone Bias in Biometric Systems",
+    authors: "Jema David Ndibwile, Ntung Ngela Landon, Floride Tuyisenge",
+    venue: "Journal of Cybersecurity and Privacy, 6(1)",
+    href: "https://doi.org/10.3390/jcp6010012",
+    action: "Paper",
+  },
+  {
+    year: "2026",
+    status: "Conference paper · Preprint",
+    title: "Architectural Bias in Face Presentation Attack Detection: A Comparative Study of Vision Transformers and Convolutional Neural Networks",
+    authors: "Ntung Ngela Landon, Floride Tuyisenge, Jema David Ndibwile",
+    venue: "CSP 2026 · arXiv:2606.18510",
+    href: "https://doi.org/10.48550/arXiv.2606.18510",
+    action: "Preprint",
+  },
+  {
+    year: "2026",
+    status: "Manuscript under review",
+    title: "Fairness Under Distribution Shift in Face Presentation Attack Detection: A Cross-Dataset and Ablation-Based Analysis",
+    authors: "Ntung Ngela Landon, Floride Tuyisenge, Remy Dukundane, Emmanuel Iduh, Jema David Ndibwile",
+    venue: "Under review at IEEE Access",
+  },
+  {
+    year: "2026",
+    status: "Manuscript under review",
+    title: "Adversarial Artificial Intelligence Threats in Smart Energy Grids: When Learning Systems Learn from the Attacker",
+    authors: "Jema David Ndibwile, Ntung Ngela Landon, Lunodzo Mwinuka",
+    venue: "Under review at Energy Reports",
+  },
+];
+
+const experience = [
+  {
+    date: "Mar 2026 — Mar 2027",
+    role: "Research Associate",
+    place: "Carnegie Mellon University · Pittsburgh",
+    text: "Leading research on the robustness and reproducibility of demographic fairness in face PAD under distribution shift, while contributing to a Microsoft-funded malware analysis project.",
+  },
+  {
+    date: "Aug — Dec 2025",
+    role: "Research Assistant",
+    place: "Carnegie Mellon University · Pittsburgh",
+    text: "Led comparative experiments across ViT-Tiny, ResNet18, and DeiT-S to study architecture, demographic performance, and cross-demographic generalization.",
+  },
+  {
+    date: "Jul — Nov 2025",
+    role: "AI, Data Management & Cybersecurity Intern",
+    place: "International Telecommunication Union · Geneva",
+    text: "Investigated platform vulnerabilities and the relationship between AI, data management, and security in AI-enabled information systems.",
+  },
+  {
+    date: "Jun — Aug 2025",
+    role: "Research Intern",
+    place: "Carnegie Mellon University · Pittsburgh",
+    text: "Initiated fairness research for underrepresented African populations and developed a lightweight face PAD pipeline with statistical fairness evaluation.",
+  },
+];
+
+const projects = [
+  {
+    label: "MSc practicum",
+    title: "Cross-Platform Automated Malware Analysis Pipeline",
+    text: "An automated Windows and Linux malware-analysis workflow integrating CAPE Sandbox, isolated virtual machines, structured reporting, and SOC/SIEM ingestion.",
+    tags: ["CAPE Sandbox", "Python", "SIEM"],
+  },
+  {
+    label: "Applied security",
+    title: "Ethical Hacking & Penetration Testing",
+    text: "Security assessments spanning vulnerability discovery, wireless security, traffic analysis, and automated network scanning.",
+    tags: ["Kali Linux", "Burp Suite", "Wireshark"],
+  },
+  {
+    label: "BEng final project",
+    title: "IoT-Based Fetal Health Monitoring System",
+    text: "A remote monitoring system combining embedded sensors, signal processing, and wireless transmission of fetal movement indicators.",
+    tags: ["IoT", "Signal processing", "Arduino"],
+  },
+];
+
+const skills = [
+  ["Research methods", "Controlled experiments, ablations, cross-dataset evaluation, multi-seed replication"],
+  ["AI / ML", "Computer vision, CNNs, Vision Transformers, transfer learning, model evaluation"],
+  ["Security", "Malware analysis, penetration testing, biometric security, vulnerability assessment"],
+  ["Tools", "Python, TensorFlow, OpenCV, scikit-learn, CAPE Sandbox, Wireshark"],
+];
+
+function ArrowIcon() {
+  return <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 5l5 5-5 5" /></svg>;
+}
+
+function ExternalIcon() {
+  return <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M8 5H5v10h10v-3M11 4h5v5M10 10l6-6" /></svg>;
+}
+
+function TuneIcon() {
+  return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10M14 4v6M6 14v6" /></svg>;
+}
 
 export default function Home() {
+  const [config, setConfig] = useState<SiteConfig>(defaultConfig);
+  const [studioOpen, setStudioOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [ready, setReady] = useState(false);
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
+  useEffect(() => {
+    queueMicrotask(() => {
+      try {
+        const saved = window.localStorage.getItem("ntung-site-studio-v1");
+        if (saved) {
+          const parsed = JSON.parse(saved) as Partial<SiteConfig>;
+          setConfig({ ...defaultConfig, ...parsed, sections: { ...defaultConfig.sections, ...parsed.sections } });
+        }
+      } catch {
+        // A blocked storage API should not affect the public site.
+      }
+      setReady(true);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!ready) return;
+    window.localStorage.setItem("ntung-site-studio-v1", JSON.stringify(config));
+  }, [config, ready]);
+
+  useEffect(() => {
+    document.body.style.overflow = studioOpen ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [studioOpen]);
+
+  useEffect(() => {
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setStudioOpen(false);
+        setMenuOpen(false);
+      }
+    };
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, []);
+
+  const update = <K extends keyof SiteConfig>(key: K, value: SiteConfig[K]) => {
+    setConfig((current) => ({ ...current, [key]: value }));
+  };
+
+  const toggleSection = (key: SectionKey) => {
+    setConfig((current) => ({ ...current, sections: { ...current.sections, [key]: !current.sections[key] } }));
+  };
+
+  const closeMenu = () => setMenuOpen(false);
+
   return (
-    <main>
-      {/* NAVIGATION */}
-      <nav className="navbar">
-        <div className="nav-container">
-          <a href="#home" className="logo">
-            NNL
+    <div
+      className={`research-site ${ready ? "is-ready" : ""}`}
+      data-theme={config.theme}
+      data-font={config.font}
+      data-hero={config.hero}
+      data-portrait={config.portrait}
+      data-width={config.width}
+      data-density={config.density}
+      data-publications={config.publications}
+      data-corners={config.corners}
+    >
+      <header className="site-header">
+        <div className="site-shell header-inner">
+          <a className="brand" href="#top" onClick={closeMenu}>
+            <span className="brand-mark" aria-hidden="true">NL</span>
+            <span className="brand-copy"><strong>Ntung N. Landon</strong><small>AI / ML Security Researcher</small></span>
           </a>
-
-          <button
-            className="menu-button"
-            onClick={() => setMenuOpen(!menuOpen)}
-            aria-label="Toggle navigation"
-          >
-            ☰
-          </button>
-
-          <div className={`nav-links ${menuOpen ? "open" : ""}`}>
-            <a href="#research" onClick={() => setMenuOpen(false)}>
-              Research
-            </a>
-            <a href="#publications" onClick={() => setMenuOpen(false)}>
-              Publications
-            </a>
-            <a href="#experience" onClick={() => setMenuOpen(false)}>
-              Experience
-            </a>
-            <a href="#projects" onClick={() => setMenuOpen(false)}>
-              Projects
-            </a>
-            <a href="#about" onClick={() => setMenuOpen(false)}>
-              About
-            </a>
-            <a href="#contact" onClick={() => setMenuOpen(false)}>
-              Contact
-            </a>
+          <nav className={`primary-nav ${menuOpen ? "is-open" : ""}`} aria-label="Primary navigation">
+            {config.sections.research && <a href="#research" onClick={closeMenu}>Research</a>}
+            {config.sections.publications && <a href="#publications" onClick={closeMenu}>Publications</a>}
+            {config.sections.experience && <a href="#experience" onClick={closeMenu}>Experience</a>}
+            {config.sections.about && <a href="#about" onClick={closeMenu}>About</a>}
+          </nav>
+          <div className="header-actions">
+            <a className="cv-link" href={`${basePath}/Ntung_Ngela_Landon_CV.pdf`} target="_blank" rel="noreferrer">CV <ExternalIcon /></a>
+            <button className="studio-trigger" type="button" onClick={() => setStudioOpen(true)} aria-label="Open site studio" aria-expanded={studioOpen}>
+              <TuneIcon /><span>Customize</span>
+            </button>
+            <button className="menu-trigger" type="button" onClick={() => setMenuOpen((open) => !open)} aria-label="Toggle navigation" aria-expanded={menuOpen}>
+              <span /><span />
+            </button>
           </div>
         </div>
-      </nav>
+      </header>
 
-      {/* HERO */}
-      <section className="hero" id="home">
-        <div className="hero-container">
-          <div className="hero-text">
-            <p className="eyebrow">CYBERSECURITY RESEARCHER</p>
-
-            <h1>
-              Securing AI.
-              <br />
-              Understanding how
-              <br />
-              <span>machine learning systems fail.</span>
-            </h1>
-
-            <p className="hero-description">
-              I am a cybersecurity researcher working at the intersection of
-              AI/ML security, trustworthy machine learning, and applied
-              cybersecurity.
-            </p>
-
-            <p className="hero-description">
-              My research explores the security, robustness, and reliability
-              of learning-based systems under distribution shifts, adversarial
-              conditions, architectural changes, and real-world constraints.
-            </p>
-
-            <div className="hero-buttons">
-              <a href="#research" className="button primary">
-                Explore My Research
-              </a>
-
-
-              <a
-                href={`${basePath}/Ntung_Ngela_Landon_CV.pdf`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="button secondary"
-              >
-                View CV
-              </a>
-            </div>
-          </div>
-
-<div className="hero-card">
-  <img
-    src={`${basePath}/Landon.jpg`}
-    alt="Ntung Ngela Landon"
-    className="profile-photo"
-  />
-
-  <h2>Ntung Ngela Landon</h2>
-
-  <p>
-    AI/ML Security · Cybersecurity · Trustworthy AI
-  </p>
-
-  <div className="hero-links">
-    <a
-      href="https://www.linkedin.com/in/ntung-landon"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      LinkedIn
-    </a>
-
-    <a
-      href="https://github.com/NTUNG-LANDON"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      GitHub
-    </a>
-  </div>
-</div>
-        </div>
-      </section>
-
-      {/* RESEARCH PROFILE */}
-      <section className="section" id="research">
-        <div className="container">
-          <p className="section-label">01 / RESEARCH PROFILE</p>
-
-          <h2 className="section-title">
-            From biometric security toward broader AI/ML security.
-          </h2>
-
-          <div className="research-profile">
-            <div>
-              <p>
-                My research journey began with the security of machine
-                learning-based biometric systems, particularly face
-                Presentation Attack Detection (PAD). Through this work, I
-                became increasingly interested in a broader question:
-                <strong> how can we understand, evaluate, and improve the
-                security and reliability of machine-learning systems?</strong>
-              </p>
-
-              <p>
-                My published and ongoing research examines fairness,
-                architectural behavior, distribution shift, generalization,
-                reproducibility, and robustness in ML-based security systems.
-                These experiences have motivated me to expand toward broader
-                questions in AI/ML security, including adversarial machine
-                learning, model vulnerabilities, threat modeling, and the
-                security of emerging AI systems.
-              </p>
-
-              <p>
-                I am particularly interested in research that combines
-                rigorous empirical evaluation with practical cybersecurity
-                applications.
-              </p>
-            </div>
-
-            <div className="research-focus-card">
-              <h3>Research Focus</h3>
-
-              <ul>
-                <li>AI / ML Security</li>
-                <li>Adversarial Machine Learning</li>
-                <li>ML Model Vulnerabilities</li>
-                <li>Trustworthy & Reliable AI</li>
-                <li>Distribution Shift & Robustness</li>
-                <li>Security of Emerging AI Systems</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* RESEARCH INTERESTS */}
-      <section className="section section-alt">
-        <div className="container">
-          <p className="section-label">02 / RESEARCH INTERESTS</p>
-
-          <h2 className="section-title">
-            Questions I want to explore.
-          </h2>
-
-          <div className="interest-grid">
-            <div className="interest-card">
-              <span>01</span>
-              <h3>AI / ML Security</h3>
-              <p>
-                Understanding threats, vulnerabilities, and failure modes in
-                machine-learning systems.
-              </p>
-            </div>
-
-            <div className="interest-card">
-              <span>02</span>
-              <h3>Adversarial ML</h3>
-              <p>
-                Investigating how adversarial inputs and attacks can influence
-                model behavior and system security.
-              </p>
-            </div>
-
-            <div className="interest-card">
-              <span>03</span>
-              <h3>Model Robustness</h3>
-              <p>
-                Studying model behavior under distribution shifts,
-                architectural changes, and changing evaluation conditions.
-              </p>
-            </div>
-
-            <div className="interest-card">
-              <span>04</span>
-              <h3>Trustworthy AI</h3>
-              <p>
-                Developing reliable and reproducible approaches for evaluating
-                learning-based systems.
-              </p>
-            </div>
-
-            <div className="interest-card">
-              <span>05</span>
-              <h3>Model Vulnerabilities</h3>
-              <p>
-                Exploring systematic approaches for identifying weaknesses in
-                ML models and AI-enabled systems.
-              </p>
-            </div>
-
-            <div className="interest-card">
-              <span>06</span>
-              <h3>Emerging AI Security</h3>
-              <p>
-                Expanding toward security challenges involving modern AI
-                systems, including large language models.
-              </p>
-            </div>
-          </div>
-
-          <div className="application-areas">
-            <h3>Application Areas</h3>
-
-            <div className="tag-list">
-              <span>Biometric Security</span>
-              <span>Face Presentation Attack Detection</span>
-              <span>Cybersecurity</span>
-              <span>Malware Analysis</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* RESEARCH JOURNEY */}
-      <section className="section">
-        <div className="container">
-          <p className="section-label">03 / RESEARCH JOURNEY</p>
-
-          <h2 className="section-title">
-            From applied biometric security to AI/ML security.
-          </h2>
-
-          <div className="timeline">
-            <div className="timeline-item">
-              <div className="timeline-number">01</div>
-
-              <div className="timeline-content">
-                <p className="timeline-label">FOUNDATION</p>
-
-                <h3>Secure & Fair ML-Based Biometric Systems</h3>
-
-                <p>
-                  My initial research investigated demographic fairness in
-                  face Presentation Attack Detection. I developed and
-                  evaluated fairness-aware approaches involving
-                  ethnicity-aware preprocessing and group-specific decision
-                  thresholds.
-                </p>
-
-                <p>
-                  This work introduced me to a broader challenge: understanding
-                  how machine-learning systems behave differently across
-                  populations and operating conditions.
-                </p>
+      <main id="top">
+        <section className="hero-section">
+          <div className="site-shell hero-grid">
+            <div className="hero-copy">
+              <p className="kicker"><span /> AI / ML security · Trustworthy AI</p>
+              <h1>Securing machine learning for the conditions that matter.</h1>
+              <p className="hero-lede">I study how AI systems behave when fairness, robustness, and security are tested beyond controlled settings.</p>
+              <p className="hero-note">Research Associate at Carnegie Mellon University, working across biometric security, distribution shift, reproducibility, and malware analysis.</p>
+              <div className="hero-actions">
+                {config.sections.research && <a className="text-link text-link-primary" href="#research">Explore my research <ArrowIcon /></a>}
+                {config.sections.contact && <a className="text-link" href="mailto:nngelala@andrew.cmu.edu">Get in touch <ArrowIcon /></a>}
               </div>
             </div>
+            {config.portrait !== "hidden" && (
+              <div className="portrait-wrap">
+                <span className="portrait-outline" aria-hidden="true" />
+                <Image src={`${basePath}/Landon.jpg`} alt="Ntung Ngela Landon" className="portrait" width={392} height={596} priority />
+                <p className="portrait-caption"><span>Currently</span> Pittsburgh, USA</p>
+              </div>
+            )}
+          </div>
+          <div className="site-shell scholar-strip" aria-label="Scholarly links">
+            <span>Research profiles</span>
+            <a href="https://github.com/NTUNG-LANDON" target="_blank" rel="noreferrer">GitHub <ExternalIcon /></a>
+            <a href="https://www.linkedin.com/in/ntung-landon" target="_blank" rel="noreferrer">LinkedIn <ExternalIcon /></a>
+            <a href="https://doi.org/10.3390/jcp6010012" target="_blank" rel="noreferrer">Latest paper <ExternalIcon /></a>
+          </div>
+        </section>
 
-            <div className="timeline-item">
-              <div className="timeline-number">02</div>
-
-              <div className="timeline-content">
-                <p className="timeline-label">MODEL BEHAVIOR</p>
-
-                <h3>Understanding Architectural Effects</h3>
-
-                <p>
-                  My second research project examined architectural bias in
-                  face presentation attack detection, comparing convolutional
-                  neural networks and vision transformers.
-                </p>
-
-                <p>
-                  I investigated how architectural choices influence model
-                  performance and demographic behavior, strengthening my
-                  interest in the relationship between model design, behavior,
-                  and security.
-                </p>
+        {config.sections.research && (
+          <section className="content-section research-section" id="research">
+            <div className="site-shell">
+              <div className="section-heading">
+                <div><p className="section-index">01 · Research</p><h2>Questions shaping my work</h2></div>
+                <p>My research connects rigorous empirical evaluation with practical cybersecurity—especially where aggregate performance can hide unequal or unstable behavior.</p>
+              </div>
+              <div className="question-grid">
+                {researchQuestions.map((item) => (
+                  <article className="question-card" key={item.number}>
+                    <span className="card-number">{item.number}</span><h3>{item.title}</h3><p>{item.text}</p>
+                    <div className="tag-row">{item.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
+                  </article>
+                ))}
+              </div>
+              <div className="research-statement">
+                <p className="statement-label">Research direction</p>
+                <p className="statement-copy">I am interested in the security, reliability, and trustworthy deployment of machine-learning systems: how vulnerabilities emerge, how evaluation choices shape our conclusions, and how evidence can remain useful across populations and environments.</p>
+                <a className="text-link" href={`${basePath}/research/`}>Read the full research profile <ArrowIcon /></a>
               </div>
             </div>
+          </section>
+        )}
 
-            <div className="timeline-item">
-              <div className="timeline-number">03</div>
+        {config.sections.publications && (
+          <section className="content-section publications-section" id="publications">
+            <div className="site-shell">
+              <div className="section-heading section-heading-compact">
+                <div><p className="section-index">02 · Publications</p><h2>Selected writing</h2></div>
+                <a className="text-link" href={`${basePath}/publications/`}>View all <ArrowIcon /></a>
+              </div>
+              <div className="publication-list">
+                {publications.map((publication) => (
+                  <article className="publication-row" key={publication.title}>
+                    <div className="publication-meta"><span>{publication.year}</span><small>{publication.status}</small></div>
+                    <div className="publication-body"><h3>{publication.title}</h3><p>{publication.authors}</p><small>{publication.venue}</small></div>
+                    <div className="publication-action">
+                      {publication.href ? <a href={publication.href} target="_blank" rel="noreferrer" aria-label={`${publication.action}: ${publication.title}`}>{publication.action} <ExternalIcon /></a> : <span>In review</span>}
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
 
-              <div className="timeline-content">
-                <p className="timeline-label">ROBUSTNESS & GENERALIZATION</p>
+        {config.sections.experience && (
+          <section className="content-section experience-section" id="experience">
+            <div className="site-shell split-section">
+              <div className="split-intro"><p className="section-index">03 · Experience</p><h2>Research across models, systems, and settings.</h2><p>From biometric model evaluation to platform security and malware analysis, my work bridges research questions with deployable systems.</p></div>
+              <div className="timeline">
+                {experience.map((item, index) => (
+                  <article className="timeline-item" key={`${item.role}-${item.date}`}>
+                    <span className="timeline-dot">{String(index + 1).padStart(2, "0")}</span>
+                    <div><p className="timeline-date">{item.date}</p><h3>{item.role}</h3><p className="timeline-place">{item.place}</p><p>{item.text}</p></div>
+                  </article>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
 
-                <h3>Fairness Under Distribution Shift</h3>
+        {config.sections.projects && (
+          <section className="content-section projects-section" id="projects">
+            <div className="site-shell">
+              <div className="section-heading section-heading-compact">
+                <div><p className="section-index">04 · Projects</p><h2>Systems I have built</h2></div>
+                <a className="text-link" href={`${basePath}/projects/`}>Project details <ArrowIcon /></a>
+              </div>
+              <div className="project-grid">
+                {projects.map((project, index) => (
+                  <article className={`project-card project-card-${index + 1}`} key={project.title}>
+                    <p className="project-label">{project.label}</p><h3>{project.title}</h3><p>{project.text}</p>
+                    <div className="tag-row">{project.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
+                  </article>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
 
-                <p>
-                  My ongoing research examines whether fairness measurements
-                  remain reliable when ML systems are evaluated across
-                  datasets and random seeds.
-                </p>
-
-                <p>
-                  The work uses cross-dataset protocols and controlled
-                  multi-seed ablations to study generalization, instability,
-                  and reproducibility in fairness evaluation.
-                </p>
-
-                <div className="research-highlight">
-                  <strong>Key question:</strong> Can we trust conclusions about
-                  an ML system when its behavior changes across datasets,
-                  evaluation conditions, and random seeds?
+        {(config.sections.about || config.sections.education || config.sections.skills) && (
+          <section className="content-section profile-section" id="about">
+            <div className="site-shell profile-grid">
+              {config.sections.about && (
+                <div className="about-block">
+                  <p className="section-index">05 · Profile</p><h2>Research grounded in careful evaluation.</h2>
+                  <p>My path began with demographic fairness in face Presentation Attack Detection and expanded into the broader security, robustness, and reliability of AI-enabled systems.</p>
+                  <p>I value reproducible experiments, transparent limitations, and research that can inform more secure real-world systems.</p>
+                  <a className="text-link" href={`${basePath}/about/`}>More about me <ArrowIcon /></a>
                 </div>
+              )}
+              <div className="profile-details">
+                {config.sections.education && (
+                  <div className="detail-block">
+                    <h3>Education</h3>
+                    <div className="education-item"><p><strong>MSc, Information Technology — Cybersecurity</strong><span>2024 — 2025</span></p><small>Carnegie Mellon University · GPA 3.64 / 4.00</small></div>
+                    <div className="education-item"><p><strong>BEng, Computer Engineering</strong><span>2019 — 2023</span></p><small>University of Buea · GPA 3.51 / 4.00</small></div>
+                  </div>
+                )}
+                {config.sections.skills && (
+                  <div className="detail-block skills-block">
+                    <h3>Methods & tools</h3>
+                    {skills.map(([label, value]) => <div className="skill-row" key={label}><strong>{label}</strong><span>{value}</span></div>)}
+                  </div>
+                )}
               </div>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* RESEARCH DIRECTION */}
-      <section className="section section-dark">
-        <div className="container">
-          <p className="section-label light">04 / FUTURE DIRECTION</p>
-
-          <h2 className="section-title light">
-            Where I want to take the research next.
-          </h2>
-
-          <div className="future-direction">
-            <p>
-              My previous research has primarily used biometric security as a
-              testbed for studying the behavior and reliability of
-              machine-learning systems. Through this work, I became
-              increasingly interested in broader AI/ML security questions.
-            </p>
-
-            <p>
-              Going forward, I am interested in extending this foundation
-              toward <strong>adversarial machine learning, ML model
-              vulnerabilities, AI security, trustworthy AI, and the security
-              of emerging AI systems including large language models.</strong>
-            </p>
-
-            <p>
-              I am particularly interested in research that investigates how
-              AI systems can fail or be manipulated, how these weaknesses can
-              be systematically evaluated, and how more robust and secure
-              learning-based systems can be designed.
-            </p>
-          </div>
-
-          <div className="research-path">
-            <div>AI / ML SECURITY</div>
-            <span>→</span>
-            <div>ROBUSTNESS</div>
-            <span>→</span>
-            <div>MODEL VULNERABILITIES</div>
-            <span>→</span>
-            <div>TRUSTWORTHY AI</div>
-          </div>
-        </div>
-      </section>
-
-      {/* PUBLICATIONS */}
-      <section className="section" id="publications">
-        <div className="container">
-          <p className="section-label">05 / PUBLICATIONS</p>
-
-          <h2 className="section-title">
-            Research contributions.
-          </h2>
-
-          <div className="publication-list">
-            <article className="publication">
-              <div className="publication-status published">
-                PUBLISHED · 2026
-              </div>
-
-              <h3>
-                Architectural Bias in Face Presentation Attack Detection: A
-                Comparative Study of Vision Transformers and Convolutional
-                Neural Networks
-              </h3>
-
-              <p className="authors">
-                <strong>Ngela Landon Ntung</strong>, Floride Tuyisenge, Remy Dukundane,
-                Emmanuel Iduh, Jema David Ndibwile
-              </p>
-
-              <p>
-                A comparative investigation of CNN and Vision Transformer
-                architectures for face presentation attack detection,
-                examining the relationship between architectural choices,
-                model performance, and demographic behavior.
-              </p>
-
-              <a
-                href="https://doi.org/10.48550/arXiv.2606.18510"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="publication-link"
-              >
-                View paper →
-              </a>
-            </article>
-
-            <article className="publication">
-              <div className="publication-status published">
-                PUBLISHED · PEER-REVIEWED JOURNAL
-              </div>
-
-              <h3>
-                Fairness-Aware Face Presentation Attack Detection Using Local
-                Binary Patterns: Bridging Skin Tone Bias in Biometric Systems
-              </h3>
-
-              <p className="authors">
-                Jema David Ndibwile, <strong>Ntung Ngela Landon</strong> and Floride Tuyisenge
-              </p>
-
-              <p>
-                Introduced a fairness-aware PAD approach combining
-                ethnicity-aware preprocessing, LBP-based classification, and
-                group-specific decision thresholds to investigate demographic
-                disparities in biometric security.
-              </p>
-
-              <h5>Journal of Security and Privacy . 2026</h5>
-
-              <a
-                href="https://doi.org/10.3390/jcp6010012"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="publication-link"
-              >
-                View paper →
-              </a>
-            </article>
-
-            <article className="publication">
-              <div className="publication-status review">
-                UNDER REVIEW - IEEE ACCESS
-              </div>
-
-              <h3>
-                Fairness Under Distribution Shift in Face Presentation Attack
-                Detection: A Cross-Dataset and Ablation-Based Analysis
-              </h3>
-
-              <p className="authors">
-                <strong>Ntung Ngela Landon</strong>, Floride Tuyisenge, Remy Dukundane, Emmanuel
-                Iduh, Jema David Ndibwile
-              </p>
-
-              <p>
-                Investigates the stability of demographic fairness under
-                cross-dataset distribution shift and random-seed variation
-                using multi-dataset evaluation and controlled ablations.
-              </p>
-            </article>
-
-            <article className="publication">
-              <div className="publication-status review">
-                UNDER REVIEW - ENERGY REPORTS
-              </div>
-
-              <h3>
-                Adversarial Artificial Intelligence Threats in Smart Energy
-                Grids: When Learning Systems Learn from the Attacker
-              </h3>
-
-              <p className="authors">
-                Jema David Ndibwile, <strong>Ngela Landon Ntung</strong>, Lunodzo Mwinuka
-              </p>
-            </article>
-          </div>
-        </div>
-      </section>
-
-      {/* CONFERENCE */}
-      <section className="section section-alt">
-        <div className="container">
-          <p className="section-label">06 / RESEARCH COMMUNICATION</p>
-
-          <div className="conference-card">
-            <div>
-              <p className="timeline-label">APRIL 2026 · SAPPORO, JAPAN</p>
-
-              <h2>
-                IEEE Conference on Cryptography, Security and Privacy
-              </h2>
-
-              <p>
-                Presented my research on architectural bias in face
-                presentation attack detection, communicating findings on the
-                behavior of different deep-learning architectures in biometric
-                security.
-              </p>
-            </div>
-
-            <div className="conference-badge">PRESENTED</div>
-          </div>
-        </div>
-      </section>
-
-      {/* EXPERIENCE */}
-      <section className="section" id="experience">
-        <div className="container">
-          <p className="section-label">07 / EXPERIENCE</p>
-
-          <h2 className="section-title">
-            Research and cybersecurity experience.
-          </h2>
-
-          <div className="experience-list">
-            <article className="experience-item">
-              <div className="experience-date">
-                MAR 2026 — PRESENT
-              </div>
-
-              <div>
-                <h3>Research Associate</h3>
-                <p className="organization">Carnegie Mellon University</p>
-
-                <p>
-                  Conducting research within a Microsoft-funded cybersecurity
-                  research initiative, currently focused on malware analysis
-                  and security evaluation.
-                </p>
-              </div>
-            </article>
-
-            <article className="experience-item">
-              <div className="experience-date">
-                AUG 2025 — DEC 2025
-              </div>
-
-              <div>
-                <h3>Research Assistant</h3>
-                <p className="organization">Carnegie Mellon University</p>
-
-                <p>
-                  Conducted research on architectural bias in face
-                  presentation attack detection, contributing to comparative
-                  evaluation of CNN and Vision Transformer architectures.
-                </p>
-              </div>
-            </article>
-
-            <article className="experience-item">
-              <div className="experience-date">
-                JUN 2025 — AUG 2025
-              </div>
-
-              <div>
-                <h3>Research Intern</h3>
-                <p className="organization">Carnegie Mellon University</p>
-
-                <p>
-                  Led research investigating fairness-aware face presentation
-                  attack detection, including preprocessing strategies,
-                  classification, group-specific thresholds, and statistical
-                  fairness evaluation.
-                </p>
-              </div>
-            </article>
-
-            <article className="experience-item">
-              <div className="experience-date">
-                JAN 2025 — APR 2025
-              </div>
-
-              <div>
-                <h3>Teaching Assistant - CMU Africa Bridge Program</h3>
-                <p className="organization">Carnegie Mellon University (CMU-Africa Campus), Kigali, Rwanda.</p>
-
-                <p>
-                  Supported undergraduate students preparing for graduate
-                  studies through the CMU Africa Bridge Program. Assisted
-                  students with technical learning, academic preparation, and
-                  transition into graduate-level study.
-                </p>
-              </div>
-            </article>
-
-            <article className="experience-item">
-              <div className="experience-date">
-                JUL 2025 — NOV 2025
-              </div>
-
-              <div>
-                <h3>AI, Data Management & Cybersecurity Intern</h3>
-                <p className="organization">
-                  International Telecommunication Union (ITU), Geneva, Switzerland.
-                </p>
-
-                <p>
-                  Conducted security assessment activities and explored
-                  vulnerabilities in an organizational platform. Also worked
-                  on Digital Object Architecture, the Advanced Information
-                  Management System, and the relationship between AI and data
-                  security.
-                </p>
-              </div>
-            </article>
-
-            <article className="experience-item">
-              <div className="experience-date">
-                SEP 2022 — FEB 2023
-              </div>
-
-              <div>
-                <h3>Networks & Telecommunications Intern</h3>
-                <p className="organization">Reseaux et Telecommunications (Resotel) Doula, Cameroon.</p>
-
-                <p>
-                  Supported installation and configuration of surveillance
-                  camera systems, maintained optical-fibre infrastructure,
-                  deployed a Synology NAS server, and implemented the 3CX
-                  communication platform.
-                </p>
-              </div>
-            </article>
-          </div>
-        </div>
-      </section>
-
-      {/* MASTER'S PRACTICUM */}
-      <section className="section section-alt">
-        <div className="container">
-          <p className="section-label">08 / SELECTED PROJECT</p>
-
-          <h2 className="section-title">
-            Cross-Platform Automated Malware Analysis Pipeline.
-          </h2>
-
-          <div className="project-feature">
-            <div className="project-description">
-              <p>
-                My Master&apos;s final practicum project developed for a client
-                environment at Carnegie Mellon University.
-              </p>
-
-              <p>
-                Designed and implemented an automated malware analysis
-                pipeline capable of handling both Windows and Linux malware.
-                The system automatically identified the target platform and
-                routed samples through the appropriate analysis environment.
-              </p>
-
-              <p>
-                The architecture integrated a honeypot network, CAPE Sandbox,
-                Windows and Linux virtual machines, event-hash collection,
-                ingestion scripts, and database reporting. The resulting
-                analysis pipeline was integrated with the CMU-Upanzi SOC/SIEM
-                environment.
-              </p>
-            </div>
-
-            <div className="tech-box">
-              <h3>Technology Stack</h3>
-
-              <div className="tag-list">
-                <span>CAPE Sandbox</span>
-                <span>Ubuntu</span>
-                <span>Windows</span>
-                <span>Malware Analysis</span>
-                <span>Python</span>
-                <span>Virtual Machines</span>
-                <span>SIEM</span>
-                <span>Automation</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* OTHER PROJECTS */}
-      <section className="section" id="projects">
-        <div className="container">
-          <p className="section-label">09 / PROJECTS</p>
-
-          <h2 className="section-title">
-            Selected technical work.
-          </h2>
-
-          <div className="project-grid">
-            <article className="project-card">
-              <span className="project-number">01</span>
-
-              <h3>Ethical Hacking & Penetration Testing</h3>
-
-              <p>
-                Conducted penetration testing activities across network
-                environments, including vulnerability discovery, Wi-Fi
-                security assessment, traffic analysis, and automated
-                vulnerability scanning.
-              </p>
-
-              <div className="tag-list">
-                <span>Kali Linux</span>
-                <span>Nmap</span>
-                <span>Burp Suite</span>
-                <span>Metasploit</span>
-                <span>Wireshark</span>
-              </div>
-            </article>
-
-            <article className="project-card">
-              <span className="project-number">02</span>
-
-              <h3>Fetal Heart Rate Monitoring System</h3>
-
-              <p>
-                Designed an IoT-based fetal movement and heart-rate monitoring
-                system involving signal processing, wireless communication,
-                and real-time health-data visualization.
-              </p>
-
-              <div className="tag-list">
-                <span>IoT</span>
-                <span>Signal Processing</span>
-                <span>Arduino</span>
-                <span>Embedded Systems</span>
-              </div>
-            </article>
-
-            <article className="project-card">
-              <span className="project-number">03</span>
-
-              <h3>Cybersecurity Research</h3>
-
-              <p>
-                Research and engineering work spanning biometric security,
-                malware analysis, penetration testing, machine learning, and
-                security evaluation.
-              </p>
-
-              <div className="tag-list">
-                <span>Python</span>
-                <span>OpenCV</span>
-                <span>TensorFlow</span>
-                <span>Cybersecurity</span>
-                <span>CAPE Sandbox</span>
-
-              </div>
-            </article>
-          </div>
-        </div>
-      </section>
-
-      {/* EDUCATION */}
-      <section className="section section-alt">
-        <div className="container">
-          <p className="section-label">10 / EDUCATION</p>
-
-          <div className="education-list">
-            <article className="education-item">
-              <p className="education-date">2024 — 2025</p>
-
-              <div>
-                <h3>Master of Science in Information Technology</h3>
-
-                <p className="organization">
-                  Carnegie Mellon University
-                </p>
-
-                <p>
-                  Cybersecurity specialization · GPA: 3.64 / 4.00
-                </p>
-
-                <p>
-                  Final practicum: Cross-Platform Automated Malware Analysis
-                  Pipeline.
-                </p>
-              </div>
-            </article>
-
-            <article className="education-item">
-              <p className="education-date">2019 — 2023</p>
-
-              <div>
-                <h3>Bachelor of Engineering in Computer Engineering</h3>
-
-                <p className="organization">
-                  University of Buea · Cameroon
-                </p>
-
-                <p>GPA: 3.51 / 4.00</p>
-
-                <p>
-                  Final project: Design and Implementation of a Cognitive-Based
-                  IoT Fetal Movement Monitoring System.
-                </p>
-              </div>
-            </article>
-          </div>
-        </div>
-      </section>
-
-      {/* SKILLS */}
-      <section className="section">
-        <div className="container">
-          <p className="section-label">11 / TECHNICAL SKILLS</p>
-
-          <div className="skills-grid">
-            <div>
-              <h3>AI / ML</h3>
-
-              <p>
-                Machine Learning · Deep Learning · Computer Vision ·
-                Presentation Attack Detection · Model Evaluation · Statistical
-                Analysis · Distribution Shift · Fairness Evaluation
-              </p>
-            </div>
-
-            <div>
-              <h3>Security</h3>
-
-              <p>
-                Cybersecurity · Penetration Testing · Malware Analysis ·
-                Adversarial Security · Network Security · Security Assessment
-              </p>
-            </div>
-
-            <div>
-              <h3>Tools & Technologies</h3>
-
-              <p>
-                Python · TensorFlow · OpenCV · Kali Linux · Wireshark ·
-                Burp Suite · Metasploit · Nmap · CAPE Sandbox · Git · Linux ·
-                Windows
-              </p>
-            </div>
-
-            <div>
-              <h3>Research</h3>
-
-              <p>
-                Experimental Design · Ablation Studies · Cross-Dataset
-                Evaluation · Statistical Testing · Bootstrap Confidence
-                Intervals · Reproducibility · Technical Writing
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* LEADERSHIP */}
-      <section className="section section-alt">
-        <div className="container">
-          <p className="section-label">12 / LEADERSHIP & RECOGNITION</p>
-
-          <div className="leadership-grid">
-            <div className="recognition-card">
-              <span>2024</span>
-              <h3>Future Africa Leaders Award</h3>
-              <p>
-                Recipient of the Future Africa Leaders Award 2024.
-              </p>
-            </div>
-
-            <div className="recognition-card">
-              <span>2020</span>
-              <h3>Leadership Initiative Award</h3>
-              <p>
-                Recipient of the 2020 Leadership Initiative Award.
-              </p>
-            </div>
-
-            <div className="recognition-card">
-              <span>2025</span>
-              <h3>Women in Tech Club</h3>
-              <p>
-                Served as Events Manager, supporting technical and community
-                events and initiatives.
-              </p>
-            </div>
-
-            <div className="recognition-card">
-              <span>2026</span>
-              <h3>Partnership & Sponsorship Lead</h3>
-              <p>
-                Served on the organizing committee for Africa Forge Challenge
-                2.0.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ABOUT */}
-      <section className="section" id="about">
-        <div className="container narrow">
-          <p className="section-label">13 / ABOUT</p>
-
-          <h2 className="section-title">
-            Building secure and trustworthy intelligent systems.
-          </h2>
-
-          <p className="large-text">
-            I am interested in research at the boundary between artificial
-            intelligence and cybersecurity: understanding how learning systems
-            behave, where they fail, how they can be attacked, and how their
-            reliability can be evaluated.
-          </p>
-
-          <p className="large-text">
-            My background combines computer engineering, cybersecurity
-            training, machine-learning research, biometric security,
-            malware analysis, and practical security assessment. I am
-            currently seeking opportunities to pursue doctoral research and
-            collaborate with researchers working on AI/ML security,
-            adversarial machine learning, trustworthy AI, and related areas.
-          </p>
-        </div>
-      </section>
-
-      {/* CONTACT */}
-      <section className="section section-dark" id="contact">
-        <div className="container contact-section">
-          <p className="section-label light">14 / CONTACT</p>
-
-          <h2 className="section-title light">
-            Interested in research collaboration?
-          </h2>
-
-          <p>
-            I am open to PhD research opportunities, research collaborations,
-            and discussions around AI/ML security and cybersecurity.
-          </p>
-
-          <div className="contact-links">
-            <a href="mailto:nngelala@andrew.cmu.edu">
-              nngelala@andrew.cmu.edu
-            </a>
-
- <a href="mailto:landonntung71@gmail.com">
-              landonntung71@gmail.com
-            </a>
-
-            <a
-              href="https://www.linkedin.com/in/ntung-landon"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              LinkedIn
-            </a>
-
-            <a
-              href="https://github.com/NTUNG-LANDON"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              GitHub
-            </a>
-          </div>
-        </div>
-      </section>
-
-      {/* FOOTER */}
-      <footer className="footer">
-        <div className="container footer-inner">
-          <p>© {new Date().getFullYear()} Ntung Ngela Landon</p>
-
-          <p>AI/ML Security · Cybersecurity · Trustworthy AI</p>
-        </div>
+          </section>
+        )}
+
+        {config.sections.contact && (
+          <section className="contact-section" id="contact">
+            <div className="site-shell contact-grid"><p className="section-index">Let&apos;s connect</p><h2>Open to thoughtful conversations about AI security and trustworthy evaluation.</h2><a className="contact-email" href="mailto:nngelala@andrew.cmu.edu">nngelala@andrew.cmu.edu <ArrowIcon /></a></div>
+          </section>
+        )}
+      </main>
+
+      <footer className="site-footer">
+        <div className="site-shell footer-inner"><p>© {new Date().getFullYear()} Ntung Ngela Landon</p><div><a href="https://www.linkedin.com/in/ntung-landon" target="_blank" rel="noreferrer">LinkedIn</a><a href="https://github.com/NTUNG-LANDON" target="_blank" rel="noreferrer">GitHub</a><a href="#top">Back to top ↑</a></div></div>
       </footer>
-    </main>
+
+      {studioOpen && <button className="studio-backdrop" aria-label="Close site studio" onClick={() => setStudioOpen(false)} />}
+      <aside className={`site-studio ${studioOpen ? "is-open" : ""}`} aria-hidden={!studioOpen} aria-label="Site customization studio">
+        <div className="studio-header">
+          <div><p className="studio-kicker">Live configurator</p><h2>Site Studio</h2><p>Change the visual system and structure. Your choices stay on this device.</p></div>
+          <button type="button" className="studio-close" onClick={() => setStudioOpen(false)} aria-label="Close site studio">×</button>
+        </div>
+        <div className="studio-scroll">
+          <fieldset className="control-group">
+            <legend>Visual system</legend>
+            <div className="theme-grid">
+              {themes.map((theme) => (
+                <button key={theme.id} type="button" className={config.theme === theme.id ? "is-selected" : ""} onClick={() => update("theme", theme.id)}>
+                  <span className="theme-swatch" style={{ "--swatch": theme.color } as React.CSSProperties} /><span>{theme.label}</span><i aria-hidden="true">✓</i>
+                </button>
+              ))}
+            </div>
+          </fieldset>
+
+          <fieldset className="control-group">
+            <legend>Typography</legend>
+            <div className="font-list">
+              {fontOptions.map((font) => (
+                <button key={font.id} type="button" className={config.font === font.id ? "is-selected" : ""} onClick={() => update("font", font.id)}>
+                  <span><strong>{font.label}</strong><small>{font.detail}</small></span><i aria-hidden="true" />
+                </button>
+              ))}
+            </div>
+          </fieldset>
+
+          <SegmentedControl label="Hero layout" value={config.hero} onChange={(value) => update("hero", value)} options={[["split", "Split"], ["center", "Center"], ["compact", "Compact"]]} />
+          <SegmentedControl label="Portrait placement" value={config.portrait} onChange={(value) => update("portrait", value)} options={[["right", "Right"], ["left", "Left"], ["hidden", "Hidden"]]} />
+          <SegmentedControl label="Content width" value={config.width} onChange={(value) => update("width", value)} options={[["compact", "Compact"], ["balanced", "Balanced"], ["wide", "Wide"]]} />
+          <SegmentedControl label="Section density" value={config.density} onChange={(value) => update("density", value)} options={[["compact", "Compact"], ["comfortable", "Comfort"], ["airy", "Airy"]]} />
+          <SegmentedControl label="Publication style" value={config.publications} onChange={(value) => update("publications", value)} options={[["list", "List"], ["grid", "Grid"]]} />
+          <SegmentedControl label="Corner style" value={config.corners} onChange={(value) => update("corners", value)} options={[["sharp", "Sharp"], ["soft", "Soft"], ["round", "Round"]]} />
+
+          <fieldset className="control-group">
+            <legend>Visible sections</legend>
+            <div className="toggle-list">
+              {(Object.keys(config.sections) as SectionKey[]).map((key) => (
+                <label key={key}><span>{key}</span><input type="checkbox" checked={config.sections[key]} onChange={() => toggleSection(key)} /><i aria-hidden="true" /></label>
+              ))}
+            </div>
+          </fieldset>
+        </div>
+        <div className="studio-footer"><button type="button" className="studio-reset" onClick={() => setConfig(defaultConfig)}>Reset</button><button type="button" className="studio-done" onClick={() => setStudioOpen(false)}>Done</button></div>
+      </aside>
+    </div>
+  );
+}
+
+function SegmentedControl<T extends string>({ label, value, options, onChange }: { label: string; value: T; options: [T, string][]; onChange: (value: T) => void }) {
+  return (
+    <fieldset className="control-group">
+      <legend>{label}</legend>
+      <div className={`segmented segmented-${options.length}`}>
+        {options.map(([id, text]) => <button key={id} type="button" className={value === id ? "is-selected" : ""} onClick={() => onChange(id)}>{text}</button>)}
+      </div>
+    </fieldset>
   );
 }
