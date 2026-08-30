@@ -1,0 +1,5 @@
+User-Agent: *
+Allow: /
+
+Host: https://ntungngelalandon.com
+Sitemap: https://ntungngelalandon.com/sitemap.xml
