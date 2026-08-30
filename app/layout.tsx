@@ -1,33 +1,94 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import { site, structuredData } from "./seo";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://ntungngelalandon.com"),
-  title: "Ntung Ngela Landon | AI / ML Security Researcher",
-  description:
-    "Research portfolio of Ntung Ngela Landon, working across AI/ML security, biometric security, fairness, robustness, and trustworthy AI.",
+  metadataBase: new URL(site.url),
+  title: {
+    default: site.title,
+    template: `%s — ${site.name}`,
+  },
+  description: site.description,
+  applicationName: site.name,
+  creator: site.name,
+  publisher: site.name,
+  category: "research",
+  classification: "Academic research portfolio",
+  referrer: "strict-origin-when-cross-origin",
   keywords: [
     "Ntung Ngela Landon",
-    "Cybersecurity Researcher",
-    "AI Security",
-    "Biometric Security",
-    "Face Presentation Attack Detection",
-    "Trustworthy AI",
+    "AI/ML security researcher",
+    "machine learning security",
+    "biometric security",
+    "face presentation attack detection",
+    "algorithmic fairness",
+    "model robustness",
+    "malware analysis",
+    "trustworthy AI evaluation",
     "Carnegie Mellon University",
   ],
-  authors: [
-    {
-      name: "Ntung Ngela Landon",
-    },
-  ],
-  openGraph: {
-    title: "Ntung Ngela Landon | AI / ML Security Researcher",
-    description:
-      "Research across AI/ML security, biometric security, fairness, robustness, and trustworthy AI.",
-    url: "https://ntungngelalandon.com",
-    images: [{ url: "/Landon.jpg", alt: "Ntung Ngela Landon" }],
-    type: "website",
+  authors: [{ name: site.name, url: site.url }],
+  alternates: {
+    canonical: "/",
+    languages: { "en-US": "/" },
   },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
+  openGraph: {
+    type: "profile",
+    firstName: "Ntung Ngela",
+    lastName: "Landon",
+    title: site.title,
+    description: site.socialDescription,
+    url: "/",
+    siteName: site.name,
+    locale: "en_US",
+    images: [{
+      url: "/og-image.png",
+      secureUrl: `${site.url}/og-image.png`,
+      width: 1200,
+      height: 630,
+      type: "image/png",
+      alt: site.title,
+    }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: site.title,
+    description: site.socialDescription,
+    images: [{ url: "/og-image.png", alt: site.title }],
+  },
+  icons: {
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+  },
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    title: site.shortName,
+    statusBarStyle: "default",
+  },
+  formatDetection: {
+    telephone: false,
+    email: false,
+    address: false,
+  },
+};
+
+export const viewport: Viewport = {
+  colorScheme: "light dark",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#0e1318" },
+  ],
 };
 
 export default function RootLayout({
@@ -36,8 +97,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body>{children}</body>
+    <html lang="en-US">
+      <body>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(structuredData).replace(/</g, "\\u003c"),
+          }}
+        />
+        {children}
+      </body>
     </html>
   );
 }
