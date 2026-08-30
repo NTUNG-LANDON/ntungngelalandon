@@ -53,6 +53,7 @@ check((html.match(/<h1(?:\s|>)/g) ?? []).length === 1, "The single-page site mus
 check(html.includes('lang="en-US"'), "Document language is missing");
 check(html.includes('data-theme="graphite"') && html.includes('data-font="dm"') && html.includes('data-width="sixty"'), "Published design defaults are incorrect");
 check(!/localhost|127\.0\.0\.1/.test(head), "Local preview URLs leaked into metadata");
+check(!html.includes("Open Site Studio") && !html.includes('aria-label="Site Studio"'), "Tweak controls must not appear in production");
 
 for (const section of ["home", "research", "publications", "experience", "education", "contact"]) {
   check(html.includes(`id="${section}"`), `${section} is absent from prerendered HTML`);

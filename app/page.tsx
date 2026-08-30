@@ -213,6 +213,7 @@ const projects = [
 ];
 
 const navPages: Page[] = ["home", "research", "publications", "experience", "education", "contact"];
+const studioEnabled = process.env.NODE_ENV === "development";
 
 export default function Home() {
   const [activeSection, setActiveSection] = useState<Page>("home");
@@ -235,7 +236,7 @@ export default function Home() {
   useEffect(() => {
     queueMicrotask(() => {
       try {
-        const stored = window.localStorage.getItem("ntung-site-studio-v6");
+        const stored = studioEnabled ? window.localStorage.getItem("ntung-site-studio-v6") : null;
         if (stored) {
           const parsed = JSON.parse(stored) as Partial<SiteConfig>;
           setConfig({ ...defaultConfig, ...parsed, content: { ...defaultConfig.content, ...parsed.content } });
@@ -249,7 +250,7 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    if (!ready) return;
+    if (!ready || !studioEnabled) return;
     window.localStorage.setItem("ntung-site-studio-v6", JSON.stringify(config));
   }, [config, ready]);
 
@@ -336,7 +337,7 @@ export default function Home() {
           </nav>
           <div className="header-actions">
             <button className="mode-toggle" type="button" onClick={() => setDarkMode((current) => !current)} aria-label={darkMode ? "Use light mode" : "Use dark mode"}>{darkMode ? <Sun /> : <Moon />}</button>
-            <button type="button" onClick={openStudio} aria-label="Open Site Studio" aria-expanded={studioOpen}><SlidersHorizontal /></button>
+            {studioEnabled && <button type="button" onClick={openStudio} aria-label="Open Site Studio" aria-expanded={studioOpen}><SlidersHorizontal /></button>}
           </div>
         </header>
 
@@ -350,8 +351,8 @@ export default function Home() {
         </main>
       </div>
 
-      {studioOpen && <button className="studio-backdrop" type="button" aria-label="Close Site Studio" onClick={() => setStudioOpen(false)} />}
-      <SiteStudio
+      {studioEnabled && studioOpen && <button className="studio-backdrop" type="button" aria-label="Close Site Studio" onClick={() => setStudioOpen(false)} />}
+      {studioEnabled && <SiteStudio
         open={studioOpen}
         config={config}
         scrollRef={studioScrollRef}
@@ -359,7 +360,7 @@ export default function Home() {
         toggleContent={toggleContent}
         reset={reset}
         close={() => setStudioOpen(false)}
-      />
+      />}
     </div>
   );
 }
