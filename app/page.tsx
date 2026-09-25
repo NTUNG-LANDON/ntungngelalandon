@@ -148,20 +148,28 @@ const publications = [
     type: "Under review",
     title: "Adversarial Artificial Intelligence Threats in Smart Energy Grids: When Learning Systems Learn from the Attacker",
     meta: "J. D. Ndibwile, N. N. Landon, L. Mwinuka · Energy Reports",
+    summary: "Investigating how attackers can exploit learning-based systems in smart energy environments and the implications for resilient AI-enabled infrastructure.",
   },
+];
+
+const researchQuestions = [
+  "How effectively do existing defenses detect mutated malware?",
+  "Which modifications cause detection failures?",
+  "How can defenses be hardened against adaptive evasion?",
+  "How should ML-based security systems be evaluated against evolving threats?",
 ];
 
 const experience = [
   {
     date: "Mar 2026 — Mar 2027",
     role: "Research Associate",
-    place: "Carnegie Mellon University · Pittsburgh",
+    place: "Carnegie Mellon University Africa · Kigali, Rwanda",
     detail: "Leads fairness robustness research in face PAD under distribution shift and contributes to a Microsoft-funded malware analysis project.",
   },
   {
     date: "Aug — Dec 2025",
     role: "Research Assistant",
-    place: "Carnegie Mellon University · Pittsburgh",
+    place: "Carnegie Mellon University Africa · Kigali, Rwanda",
     detail: "Led comparative ViT, ResNet, and DeiT experiments on architecture, demographic performance, and cross-demographic generalization.",
   },
   {
@@ -173,13 +181,13 @@ const experience = [
   {
     date: "Jun — Aug 2025",
     role: "Research Intern",
-    place: "Carnegie Mellon University · Pittsburgh",
+    place: "Carnegie Mellon University Africa · Kigali, Rwanda",
     detail: "Initiated demographic fairness research for underrepresented African populations and developed a lightweight face PAD pipeline.",
   },
   {
     date: "Jan — Apr 2025",
     role: "Teaching Assistant · CMU Africa Bridge Program",
-    place: "Carnegie Mellon University Africa · Kigali",
+    place: "Carnegie Mellon University Africa · Kigali, Rwanda",
     detail: "Supported undergraduate students preparing for graduate-level study in computing and technology.",
   },
   {
@@ -370,13 +378,27 @@ function HomeView({ config, basePath, navigate }: { config: SiteConfig; basePath
       <section className="home-hero">
         <div className="hero-copy">
           <h1>Ntung Ngela Landon</h1>
-          <p className="hero-statement">I study fairness, robustness, and security in machine-learning systems, with a focus on systems evaluation and real-world reliability.</p>
+          <p className="hero-statement">I study the security, robustness, and reliability of machine-learning systems, with the goal of building intelligent security systems that stay reliable under adversarial pressure, distribution shift, and evolving threats in malware defense, authentication, and other security-critical settings.</p>
           <p className="affiliation">Research Associate · Carnegie Mellon University</p>
           <a className="hero-action" href={`${basePath}/Ntung_Ngela_Landon_CV.pdf`} target="_blank" rel="noreferrer">View CV <ArrowUpRight /></a>
         </div>
         {config.portrait !== "hidden" && (
           <div className="hero-portrait"><Image src={`${basePath}/Landon.jpg`} alt="Ntung Ngela Landon" width={392} height={596} priority /></div>
         )}
+      </section>
+
+      <section className="current-research" aria-labelledby="current-research-title">
+        <div>
+          <span className="current-research-label">Current research</span>
+          <h2 id="current-research-title">Malware Defense &amp; Adversarial Robustness</h2>
+          <p>I investigate whether machine-learning-based malware defenses remain effective when attackers modify real-world malware samples. My current Microsoft-funded research involves collecting malware, generating mutations, executing samples in isolated virtualized environments, and evaluating detection failures to identify weaknesses and improve defensive robustness.</p>
+        </div>
+        <div>
+          <h3>Research questions</h3>
+          <ul>
+            {researchQuestions.map((question) => <li key={question}>{question}</li>)}
+          </ul>
+        </div>
       </section>
 
       {config.content.focus && (
@@ -391,7 +413,7 @@ function HomeView({ config, basePath, navigate }: { config: SiteConfig; basePath
       {config.content.overview && (
         <section className="overview-grid">
           <OverviewCard title="Research statement" action="Research profile" onClick={() => navigate("research")}>
-            <p>My work examines how evaluation choices, model architecture, datasets, and random variation shape the security and fairness conclusions we draw from AI systems.</p>
+            <p>My work examines how machine-learning-based security systems behave under adversarial pressure, distribution shift, and changing deployment conditions. I study how evaluation choices, model architecture, datasets, and random variation shape conclusions about security, fairness, robustness, and real-world reliability.</p>
           </OverviewCard>
           <OverviewCard title="Selected research" action="Current work" onClick={() => navigate("research")}>
             <strong>Fairness under distribution shift in face PAD</strong>
@@ -480,7 +502,7 @@ function PublicationsView({ layout }: { layout: PublicationLayout }) {
         {publications.map((item) => (
           <article key={item.title}>
             <div className="publication-meta"><span>{item.year}</span><small>{item.type}</small></div>
-            <div><h3>{item.title}</h3><p>{item.meta}</p></div>
+            <div><h3>{item.title}</h3><p>{item.meta}</p>{item.summary && <p className="publication-summary">{item.summary}</p>}</div>
             {item.href ? <a href={item.href} target="_blank" rel="noreferrer" aria-label={`Open ${item.title}`}><ArrowUpRight /></a> : <span className="review-status">{item.type === "Accepted for publication" ? "Accepted" : "In review"}</span>}
           </article>
         ))}
