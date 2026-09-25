@@ -254,7 +254,7 @@ button:focus-visible, a:focus-visible, summary:focus-visible { outline: 2px soli
   .view-header { grid-template-columns: 1fr; gap: 12px; }
   .contribution-grid, .publication-grid, .education-grid { grid-template-columns: 1fr; }
   .contribution-grid article { min-height: 0; }
-  .publication-list article { grid-template-columns: 58px 1fr 45px; gap: 11px; }
+  .publication-list article { grid-template-columns: 72px 1fr 45px; gap: 11px; }
   .experience-list article { grid-template-columns: 92px 1fr; gap: 11px; }
   .contact-view { min-height: 0; }
   .email-card { padding: 18px; }

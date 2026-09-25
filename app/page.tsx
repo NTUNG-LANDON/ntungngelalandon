@@ -117,30 +117,30 @@ const researchContributions = [
     detail: "Applied cross-dataset SSG and LODO protocols, five-seed replication, controlled ablations, and statistical analysis to separate stable model behavior from experimental variability.",
   },
   {
-    title: "Security research methodology",
-    summary: "Empirical evaluation designed to survive real-world variation.",
-    detail: "Research combines controlled experimentation, cross-dataset testing, multi-seed replication, threat-aware evaluation, and transparent reporting of uncertainty and limitations.",
+    title: "Malware mutation and defense evasion",
+    summary: "Testing whether malware defenses still detect mutated real-world samples.",
+    detail: "In this project, we collect real-world malware samples, mutate them, and run them in virtualized operating system environments to test whether existing malware defense systems can still detect them. The goal is to identify where these defenses fail and propose ways to harden them so that mutated malware cannot evade detection.",
   },
 ];
 
 const publications = [
   {
-    year: "2026",
+    year: "January 2026",
     type: "Journal article",
     title: "Fairness-Aware Face Presentation Attack Detection Using Local Binary Patterns: Bridging Skin Tone Bias in Biometric Systems",
     meta: "J. D. Ndibwile, N. N. Landon, F. Tuyisenge · Journal of Cybersecurity and Privacy, 6(1)",
     href: "https://doi.org/10.3390/jcp6010012",
   },
   {
-    year: "2026",
+    year: "April 2026",
     type: "Conference paper · Preprint",
     title: "Architectural Bias in Face Presentation Attack Detection: A Comparative Study of Vision Transformers and Convolutional Neural Networks",
     meta: "N. N. Landon, F. Tuyisenge, J. D. Ndibwile · CSP 2026 · arXiv:2606.18510",
     href: "https://doi.org/10.48550/arXiv.2606.18510",
   },
   {
-    year: "2026",
-    type: "Under review",
+    year: "September 2026",
+    type: "Accepted for publication",
     title: "Fairness Under Distribution Shift in Face Presentation Attack Detection: A Cross-Dataset and Ablation-Based Analysis",
     meta: "N. N. Landon, F. Tuyisenge, R. Dukundane, E. Iduh, J. D. Ndibwile · IEEE Access",
   },
@@ -371,7 +371,7 @@ function HomeView({ config, basePath, navigate }: { config: SiteConfig; basePath
       <section className="home-hero">
         <div className="hero-copy">
           <h1>Ntung Ngela Landon</h1>
-          <p className="hero-statement">I study fairness, robustness, and security in machine-learning systems, with a focus on biometric evaluation and real-world reliability.</p>
+          <p className="hero-statement">I study fairness, robustness, and security in machine-learning systems, with a focus on systems evaluation and real-world reliability.</p>
           <p className="affiliation">Research Associate · Carnegie Mellon University</p>
           <a className="hero-action" href={`${basePath}/Ntung_Ngela_Landon_CV.pdf`} download>Download CV <ArrowDown /></a>
         </div>
@@ -400,7 +400,7 @@ function HomeView({ config, basePath, navigate }: { config: SiteConfig; basePath
           </OverviewCard>
           <OverviewCard title="Publications" action="Browse publications" onClick={() => navigate("publications")}>
             <strong>4 research works</strong>
-            <p>Journal article, conference paper, and manuscripts under review.</p>
+            <p>Journal article, conference paper, and manuscripts accepted or under review.</p>
           </OverviewCard>
         </section>
       )}
@@ -482,11 +482,11 @@ function PublicationsView({ layout }: { layout: PublicationLayout }) {
           <article key={item.title}>
             <div className="publication-meta"><span>{item.year}</span><small>{item.type}</small></div>
             <div><h3>{item.title}</h3><p>{item.meta}</p></div>
-            {item.href ? <a href={item.href} target="_blank" rel="noreferrer" aria-label={`Open ${item.title}`}><ArrowUpRight /></a> : <span className="review-status">In review</span>}
+            {item.href ? <a href={item.href} target="_blank" rel="noreferrer" aria-label={`Open ${item.title}`}><ArrowUpRight /></a> : <span className="review-status">{item.type === "Accepted for publication" ? "Accepted" : "In review"}</span>}
           </article>
         ))}
       </div>
-      <div className="presentation-note"><UsersRound /><div><strong>Research presentation</strong><p>Architectural Bias in Face PAD · CSP 2026 · Sapporo, Japan</p></div></div>
+      <div className="presentation-note"><UsersRound /><div><strong>Research presentation</strong><p>Architectural Bias in Face PAD · International Conference on Cryptography, Security and Privacy 2026 · Sapporo, Japan</p></div></div>
     </section>
   );
 }
@@ -524,6 +524,7 @@ function ContactView() {
     <section className="contact-view page-view">
       <ViewHeader title="Contact" text="For research conversations, collaboration, or speaking opportunities." />
       <a className="email-card" href="mailto:nngelala@andrew.cmu.edu"><Mail /><span><small>Email</small>nngelala@andrew.cmu.edu</span><ArrowRight /></a>
+      <a className="email-card" href="mailto:landonntung71@gmail.com"><Mail /><span><small>Email</small>landonntung71@gmail.com</span><ArrowRight /></a>
       <div className="contact-links">
         <a href="https://github.com/NTUNG-LANDON" target="_blank" rel="noreferrer"><FontAwesomeIcon icon={faGithub} /> GitHub <ArrowUpRight /></a>
         <a href="https://www.linkedin.com/in/ntung-landon" target="_blank" rel="noreferrer"><FontAwesomeIcon icon={faLinkedinIn} /> LinkedIn <ArrowUpRight /></a>
