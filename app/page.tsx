@@ -3,7 +3,6 @@
 import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
-  ArrowDown,
   ArrowRight,
   ArrowUpRight,
   BookOpenText,
@@ -373,7 +372,7 @@ function HomeView({ config, basePath, navigate }: { config: SiteConfig; basePath
           <h1>Ntung Ngela Landon</h1>
           <p className="hero-statement">I study fairness, robustness, and security in machine-learning systems, with a focus on systems evaluation and real-world reliability.</p>
           <p className="affiliation">Research Associate · Carnegie Mellon University</p>
-          <a className="hero-action" href={`${basePath}/Ntung_Ngela_Landon_CV.pdf`} download>Download CV <ArrowDown /></a>
+          <a className="hero-action" href={`${basePath}/Ntung_Ngela_Landon_CV.pdf`} target="_blank" rel="noreferrer">View CV <ArrowUpRight /></a>
         </div>
         {config.portrait !== "hidden" && (
           <div className="hero-portrait"><Image src={`${basePath}/Landon.jpg`} alt="Ntung Ngela Landon" width={392} height={596} priority /></div>
